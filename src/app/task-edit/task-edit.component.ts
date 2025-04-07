@@ -17,7 +17,8 @@ export class TaskEditComponent implements OnInit {
   taskId: string | null = null;
   isNewTask = true;
   pageTitle = 'New Task';
-
+  maxDate: string = new Date(new Date().setFullYear(new Date().getFullYear() + 5)).toISOString(); // 5 years ahead
+  
   constructor(
     private formBuilder: FormBuilder,
     private taskService: TaskService,
