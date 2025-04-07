@@ -4,31 +4,31 @@ import { TabsPage } from './tabs.page';
 
 const routes: Routes = [
   {
-    path: 'tabs',
+    path: '',
     component: TabsPage,
     children: [
       {
-        path: 'tab1',
-        loadChildren: () => import('../tab1/tab1.module').then(m => m.Tab1PageModule)
+        path: 'task-list',
+        loadChildren: () => import('../task-list/task-list.module').then(m => m.TaskListModule)
       },
       {
-        path: 'tab2',
-        loadChildren: () => import('../tab2/tab2.module').then(m => m.Tab2PageModule)
+        path: 'task-edit',
+        loadChildren: () => import('../task-edit/task-edit.module').then(m => m.TaskEditModule)
       },
       {
-        path: 'tab3',
-        loadChildren: () => import('../tab3/tab3.module').then(m => m.Tab3PageModule)
+        path: 'task-completed',
+        loadChildren: () => import('../task-completed/task-completed.module').then(m => m.TaskCompletedModule)
       },
       {
         path: '',
-        redirectTo: '/tabs/tab1',
+        redirectTo: '/tabs/task-list',
         pathMatch: 'full'
       }
-    ]
+    ] 
   },
   {
     path: '',
-    redirectTo: '/tabs/tab1',
+    redirectTo: 'tabs/task-list',
     pathMatch: 'full'
   }
 ];

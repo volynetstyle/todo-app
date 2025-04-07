@@ -35,3 +35,113 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import "@ionic/angular/css/palettes/dark.system.css";
+
+// Custom global styles
+:root {
+ --ion-color-primary: #3880ff;
+ --ion-color-primary-rgb: 56, 128, 255;
+ --ion-color-primary-contrast: #ffffff;
+ --ion-color-primary-contrast-rgb: 255, 255, 255;
+ --ion-color-primary-shade: #3171e0;
+ --ion-color-primary-tint: #4c8dff;
+}
+
+// Global animations
+.page-transition {
+ position: absolute;
+ width: 100%;
+ height: 100%;
+ 
+ &.enter {
+   animation: fadeIn 0.3s ease-in-out;
+ }
+ 
+ &.leave {
+   animation: fadeOut 0.3s ease-in-out;
+ }
+}
+
+@keyframes fadeIn {
+ from { opacity: 0; transform: translateY(20px); }
+ to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeOut {
+ from { opacity: 1; transform: translateY(0); }
+ to { opacity: 0; transform: translateY(20px); }
+}
+
+// Shared styles for empty states
+.empty-state {
+ display: flex;
+ flex-direction: column;
+ align-items: center;
+ justify-content: center;
+ height: 100%;
+ padding: 2rem;
+ text-align: center;
+ 
+ .empty-icon {
+   font-size: 5rem;
+   color: var(--ion-color-medium);
+   margin-bottom: 1rem;
+ }
+}
+
+// Custom animation for lists
+.list-animation-delay {
+ @for $i from 0 through 20 {
+   ion-item:nth-child(#{$i}) {
+     animation: itemSlideIn 0.5s ease-out;
+     animation-delay: #{$i * 0.05}s;
+     animation-fill-mode: both;
+   }
+ }
+}
+
+@keyframes itemSlideIn {
+ from {
+   opacity: 0;
+   transform: translateX(50px);
+ }
+ to {
+   opacity: 1;
+   transform: translateX(0);
+ }
+}
+
+// Custom FAB button animations
+ion-fab-button {
+ --box-shadow: 0 4px 16px rgba(var(--ion-color-primary-rgb), 0.4);
+ 
+ &:active {
+   --box-shadow: 0 2px 8px rgba(var(--ion-color-primary-rgb), 0.3);
+   transform: scale(0.95);
+ }
+ 
+ &.ion-activated {
+   animation: pulse 0.3s ease-out;
+ }
+}
+
+@keyframes pulse {
+ 0% { transform: scale(0.95); }
+ 50% { transform: scale(1.05); }
+ 100% { transform: scale(1); }
+}
+
+// Custom checkbox animation
+ion-checkbox {
+ --size: 24px;
+ transition: all 0.3s ease;
+ 
+ &.checkbox-checked {
+   animation: checkboxPulse 0.5s ease-out;
+ }
+}
+
+@keyframes checkboxPulse {
+ 0% { transform: scale(1); }
+ 50% { transform: scale(1.2); }
+ 100% { transform: scale(1); }
+}

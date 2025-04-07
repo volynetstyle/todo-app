@@ -1,1 +1,25 @@
 
+ion-tab-bar {
+ --background: var(--ion-color-primary);
+ --color: rgba(255, 255, 255, 0.7);
+ 
+ ion-tab-button {
+   --color-selected: var(--ion-color-light);
+   
+   &::before {
+     background-color: transparent;
+     display: block;
+     content: "";
+     margin: 0 auto;
+     width: 20px;
+     height: 2px;
+     position: absolute;
+     top: 0;
+     left: calc(50% - 10px);
+   }
+   
+   &.tab-selected::before {
+     background-color: var(--ion-color-light);
+   }
+ }
+}

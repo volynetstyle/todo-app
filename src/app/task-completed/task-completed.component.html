@@ -1,0 +1,41 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-title>
+      Completed Tasks
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Completed Tasks</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ng-container *ngIf="(completedTasks$ | async) as completedTasks">
+    <ion-list *ngIf="completedTasks.length > 0">
+      <ion-item-sliding *ngFor="let task of completedTasks">
+        <ion-item>
+          <ion-checkbox slot="start" [checked]="task.completed" (ionChange)="toggleTaskCompletion(task.id)"></ion-checkbox>
+          <ion-label [class.completed]="task.completed">
+            <h2>{{ task.title }}</h2>
+            <p>{{ task.description }}</p>
+            <p *ngIf="task.dueDate">Due: {{ task.dueDate | date:'medium' }}</p>
+          </ion-label>
+        </ion-item>
+        <ion-item-options side="end">
+          <ion-item-option color="danger" (click)="confirmDelete(task.id)">
+            <ion-icon slot="icon-only" name="trash"></ion-icon>
+          </ion-item-option>
+        </ion-item-options>
+      </ion-item-sliding>
+    </ion-list>
+
+    <div class="empty-state" *ngIf="completedTasks.length === 0">
+      <ion-icon name="checkmark-done-circle-outline" class="empty-icon"></ion-icon>
+      <h2>No completed tasks</h2>
+      <p>Your completed tasks will appear here</p>
+    </div>
+  </ng-container>
+</ion-content>

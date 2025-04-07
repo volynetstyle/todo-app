@@ -1,0 +1,101 @@
+<ion-header>
+  <ion-toolbar color="primary" class="header-toolbar">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/task-list" aria-label="Back to task list"></ion-back-button>
+    </ion-buttons>
+    <ion-title class="header-title">{{ pageTitle }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button 
+        (click)="saveTask()" 
+        [disabled]="taskForm.invalid" 
+        aria-label="Save task"
+        class="save-icon-btn"
+      >
+        <ion-icon slot="icon-only" name="save-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding task-edit-content">
+  <form [formGroup]="taskForm" (ngSubmit)="saveTask()" novalidate>
+    <ion-item class="form-item" lines="full">
+      <ion-label position="floating" class="form-label">Title</ion-label>
+      <ion-input 
+        formControlName="title" 
+        type="text" 
+        required 
+        placeholder="Enter task title" 
+        aria-describedby="title-error"
+        [class.invalid]="taskForm.get('title')?.invalid && taskForm.get('title')?.touched"
+      ></ion-input>
+    </ion-item>
+    <ion-note 
+      color="danger" 
+      class="form-note" 
+      id="title-error" 
+      *ngIf="taskForm.get('title')?.invalid && taskForm.get('title')?.touched"
+    >
+      <span *ngIf="taskForm.get('title')?.errors?.['required']">Title is required</span>
+      <span *ngIf="taskForm.get('title')?.errors?.['minlength']">Must be at least 3 characters</span>
+    </ion-note>
+
+    <ion-item class="form-item" lines="full">
+      <ion-label position="floating" class="form-label">Description</ion-label>
+      <ion-textarea 
+        formControlName="description" 
+        rows="4" 
+        placeholder="Add details (optional)"
+        auto-grow="true"
+      ></ion-textarea>
+    </ion-item>
+
+    <ion-item class="form-item" lines="full">
+      <ion-label class="form-label">Due Date</ion-label>
+      <ion-datetime-button datetime="datetime" class="datetime-btn"></ion-datetime-button>
+      <ion-modal [keepContentsMounted]="true" class="datetime-modal">
+        <ng-template>
+          <ion-datetime
+            id="datetime"
+            presentation="date"
+            formControlName="dueDate"
+            showDefaultButtons="true"
+            [max]="maxDate"
+            locale="en-US"
+          ></ion-datetime>
+        </ng-template>
+      </ion-modal>
+    </ion-item>
+
+    <ion-item class="form-item" lines="none">
+      <ion-label class="form-label">Completed</ion-label>
+      <ion-toggle 
+        formControlName="completed" 
+        slot="end" 
+        color="success" 
+        aria-label="Mark task as completed"
+      ></ion-toggle>
+    </ion-item>
+
+    <div class="form-actions ion-padding">
+      <ion-button 
+        type="submit" 
+        expand="block" 
+        color="primary" 
+        [disabled]="taskForm.invalid" 
+        class="save-button"
+      >
+        Save Task
+      </ion-button>
+      <ion-button 
+        expand="block" 
+        fill="outline" 
+        color="medium" 
+        (click)="cancel()" 
+        class="cancel-button"
+      >
+        Cancel
+      </ion-button>
+    </div>
+  </form>
+</ion-content>

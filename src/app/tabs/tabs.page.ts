@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { AnimationController } from '@ionic/angular';
 
 @Component({
   selector: 'app-tabs',
@@ -7,7 +8,14 @@ import { Component } from '@angular/core';
   standalone: false,
 })
 export class TabsPage {
+  constructor(private animationCtrl: AnimationController) {}
 
-  constructor() {}
-
+  getTabAnimation(baseEl: HTMLElement) {
+    return this.animationCtrl
+      .create()
+      .addElement(baseEl.querySelector('ion-router-outlet') as HTMLElement || document.createElement('div'))
+      .duration(300)
+      .fromTo('opacity', '0.2', '1')
+      .fromTo('transform', 'translateY(40px)', 'translateY(0px)');
+  }
 }
