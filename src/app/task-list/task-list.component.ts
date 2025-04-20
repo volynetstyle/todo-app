@@ -1,19 +1,25 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { AlertController, NavController, AnimationController } from '@ionic/angular';
+import {
+  AlertController,
+  NavController,
+  AnimationController,
+} from '@ionic/angular';
 import { Observable, map } from 'rxjs';
 import { TaskService } from '../services/task.service';
 import { Task } from '../models/task.model';
+import { shareReplay } from 'rxjs/operators';
 
 @Component({
   selector: 'app-task-list',
   templateUrl: './task-list.component.html',
   styleUrls: ['./task-list.component.scss'],
-  standalone: false, // Note: This is not standalone now
+  standalone: false,
 })
 export class TaskListComponent implements OnInit {
   activeTasks$!: Observable<Task[]>;
-  currentDate: Date = new Date(); // Added currentDate
+  completedTasks$!: Observable<Task[]>;
+  currentDate: Date = new Date();
 
   constructor(
     private taskService: TaskService,
@@ -28,36 +34,47 @@ export class TaskListComponent implements OnInit {
   }
 
   loadTasks() {
-    this.activeTasks$ = this.taskService.getTasks().pipe(
-      map(tasks => tasks.filter(task => !task.completed))
+    const tasks$ = this.taskService.getTasks().pipe(shareReplay(1));
+
+    this.activeTasks$ = tasks$.pipe(
+      map((tasks) => tasks.filter((task) => !task.completed))
+    );
+
+    this.completedTasks$ = tasks$.pipe(
+      map((tasks) => tasks.filter((task) => task.completed))
     );
   }
 
   addTask() {
-    this.router.navigate(['/task-edit', 'new']);
+    this.router.navigate(['/task-edit']);
   }
 
   editTask(taskId: string) {
     this.router.navigate(['/task-edit', taskId]);
   }
 
-  async confirmDelete(taskId: string) {
+  async confirmDelete(taskId: string, slidingItem?: any) {
     const alert = await this.alertController.create({
       header: 'Confirm Delete',
       message: 'Are you sure you want to delete this task?',
       buttons: [
         {
           text: 'Cancel',
-          role: 'cancel'
+          role: 'cancel',
+          handler: () => {
+            if (slidingItem) slidingItem.close();
+          },
         },
         {
           text: 'Delete',
           role: 'destructive',
-          handler: () => {
-            this.taskService.deleteTask(taskId);
-          }
-        }
-      ]
+          handler: async () => {
+            await this.animateDeletion(taskId);
+            await this.taskService.deleteTask(taskId);
+            if (slidingItem) slidingItem.close();
+          },
+        },
+      ],
     });
 
     await alert.present();
@@ -67,12 +84,20 @@ export class TaskListComponent implements OnInit {
     this.taskService.toggleTaskCompletion(id);
   }
 
-  animateItem(item: HTMLElement): import('@ionic/angular').Animation {
-    return this.animationCtrl
+  private async animateDeletion(taskId: string): Promise<void> {
+    const item = document.querySelector(
+      `ion-item-sliding[task-id="${taskId}"]`
+    );
+    if (!item) return;
+
+    const animation = this.animationCtrl
       .create()
       .addElement(item)
-      .duration(200)
+      .duration(300)
       .easing('ease-out')
-      .fromTo('transform', 'translateX(100%)', 'translateX(0)');
+      .fromTo('transform', 'translateX(0)', 'translateX(100%)')
+      .fromTo('opacity', '1', '0');
+
+    await animation.play();
   }
 }

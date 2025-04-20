@@ -1,113 +1,81 @@
 .task-content {
-  --background: var(--ion-color-light); // Light theme: #f4f5f8, Dark theme: #222428
-  padding: 10px;
+  --background: var(--ion-background-color, #f4f5f8);
 
-  .header-toolbar {
-    --background: var(--ion-color-primary); // Light: #3880ff, Dark: #428cff
-    --color: var(--ion-color-primary-contrast); // #ffffff
+  ion-toolbar {
+    --background: var(--ion-color-primary, #3880ff);
+    --color: var(--ion-color-primary-contrast, #fff);
   }
 
-  .header-title {
-    font-family: 'Segoe UI', sans-serif;
-    font-weight: 600;
-    font-size: 20px;
-  }
-
-  .condensed-title {
-    font-family: 'Segoe UI', sans-serif;
-    font-weight: 700;
-    font-size: 32px;
-    color: var(--ion-color-dark); // Light: #222428, Dark: #f4f5f8
+  ion-title {
+    font: 600 1.25rem "Inter", sans-serif;
   }
 
   .task-list {
-    margin: 0;
-    padding: 0;
-    background: var(--ion-item-background, #ffffff); // Light: #ffffff, Dark: #1e1e1e or #000000 (iOS)
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
+    padding: 8px;
+
+    .section-header {
+      font: 600 1.1rem "Inter", sans-serif;
+      color: var(--ion-color-dark, #222428);
+      padding: 8px 16px;
+    }
 
     .task-item-sliding {
-      transition: background 0.2s ease;
+      margin-bottom: 8px;
+    }
 
-      .task-item {
-        --background: var(--ion-item-background, #ffffff);
-        --padding-start: 10px;
-        --padding-end: 10px;
-        --inner-padding-end: 0;
-        padding: 10px 0;
-        border-bottom: 1px solid var(--ion-color-light-shade); // Light: #d7d8da, Dark: #383a3e
+    .task-item {
+      --background: var(--ion-item-background, #fff);
+      --border-radius: 8px;
+      transition: transform 0.2s ease, opacity 0.2s ease;
 
-        &:last-child {
-          border-bottom: none;
-        }
-
-        &.completed {
-          .task-title,
-          .task-description,
-          .task-due {
-            color: var(--ion-color-medium); // Light: #92949c, Dark: #989aa2
-            text-decoration: line-through;
-          }
-        }
-
-        .task-checkbox {
-          --border-color: var(--ion-color-primary); // Light: #3880ff, Dark: #428cff
-          --background-checked: var(--ion-color-primary);
-          --border-color-checked: var(--ion-color-primary);
-          margin-right: 15px;
-        }
-
-        .task-label {
-          .task-title {
-            font-family: 'Segoe UI', sans-serif;
-            font-weight: 500;
-            font-size: 16px;
-            color: var(--ion-color-dark); // Light: #222428, Dark: #f4f5f8
-            margin: 0;
-          }
-
-          .task-description {
-            font-family: 'Segoe UI', sans-serif;
-            font-size: 14px;
-            color: var(--ion-color-medium); // Light: #92949c, Dark: #989aa2
-            margin: 4px 0 0;
-          }
-
-          .task-due {
-            font-family: 'Segoe UI', sans-serif;
-            font-size: 12px;
-            color: var(--ion-color-medium);
-            margin: 4px 0 0;
-
-            &.overdue {
-              color: var(--ion-color-danger); // Light: #eb445a, Dark: #ff4961
-              font-weight: 600;
-            }
-          }
-        }
-
-        &:hover {
-          --background: var(--ion-color-light-tint); // Light: #f5f6f9, Dark: #383a3e
-          cursor: pointer;
+      &.completed {
+        opacity: 0.7;
+        .task-title {
+          text-decoration: line-through;
         }
       }
 
-      .task-options {
-        .task-option {
-          --padding-start: 15px;
-          --padding-end: 15px;
-          transition: transform 0.2s ease;
+      .task-checkbox {
+        --border-radius: 4px;
+        --size: 1.2;
+        transition: transform 0.3s ease;
 
-          ion-icon {
-            font-size: 20px;
-          }
+        &.checkbox-checked {
+          animation: checkBounce 0.3s ease;
+        }
+      }
 
-          &:active {
-            transform: scale(0.95);
+      .task-label {
+        padding: 8px 0;
+
+        .task-title {
+          font: 500 1rem "Inter", sans-serif;
+          margin: 0;
+        }
+
+        .task-description {
+          font: 0.875rem "Inter", sans-serif;
+          color: var(--ion-color-medium, #92949c);
+          margin: 4px 0;
+        }
+
+        .task-due {
+          font: 0.75rem "Inter", sans-serif;
+          color: var(--ion-color-dark, #222428);
+
+          &.overdue {
+            color: var(--ion-color-danger, #eb445a);
           }
         }
+      }
+    }
+
+    ion-item-options {
+      --border-radius: 8px;
+
+      ion-item-option {
+        --padding-start: 16px;
+        --padding-end: 16px;
       }
     }
   }
@@ -116,65 +84,171 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    height: 100%;
+    padding: 16px;
     text-align: center;
-    padding: 20px;
 
     .empty-icon {
-      font-size: 64px;
-      color: var(--ion-color-primary); // Light: #3880ff, Dark: #428cff
-      opacity: 0.8;
-      margin-bottom: 20px;
-    }
-
-    .empty-title {
-      font-family: 'Segoe UI', sans-serif;
-      font-weight: 600;
-      font-size: 24px;
-      color: var(--ion-color-dark); // Light: #222428, Dark: #f4f5f8
-      margin: 0;
+      font-size: 32px;
+      color: var(--ion-color-medium, #92949c);
+      margin-bottom: 8px;
     }
 
     .empty-message {
-      font-family: 'Segoe UI', sans-serif;
-      font-size: 16px;
-      color: var(--ion-color-medium); // Light: #92949c, Dark: #989aa2
-      margin: 8px 0 0;
+      font: 0.875rem "Inter", sans-serif;
+      color: var(--ion-color-medium, #92949c);
+      margin: 0;
     }
   }
 
-  .fab-container {
-    padding: 20px;
-
-    .add-button {
-      --background: var(--ion-color-primary); // Light: #3880ff, Dark: #428cff
-      --background-activated: var(--ion-color-primary-shade); // Light: #3171e0, Dark: #3a7be0
-      --box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-      width: 56px;
-      height: 56px;
-      transition: transform 0.2s ease;
-
-      .add-icon {
-        font-size: 28px;
-      }
-
-      &:hover {
-        transform: scale(1.05);
-      }
-
-      &:active {
-        transform: scale(0.95);
-      }
-    }
+  ion-fab-button {
+    --background: var(--ion-color-primary, #3880ff);
+    --background-activated: var(--ion-color-primary-shade, #3171e0);
   }
 }
 
-/* Dark mode adjustments (already handled by variables.scss, but fine-tune if needed) */
+@keyframes checkBounce {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.3);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
 @media (prefers-color-scheme: dark) {
   .task-content {
-    .task-list {
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); // Darker shadow for dark mode
+    .task-item {
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+  }
+}
+.task-content {
+  --background: var(--ion-background-color, #f4f5f8);
+
+  ion-toolbar {
+    --background: var(--ion-color-primary, #3880ff);
+    --color: var(--ion-color-primary-contrast, #fff);
+  }
+
+  ion-title {
+    font: 600 1.25rem "Inter", sans-serif;
+  }
+
+  .task-list {
+    padding: 8px;
+
+    .section-header {
+      font: 600 1.1rem "Inter", sans-serif;
+      color: var(--ion-color-dark, #222428);
+      padding: 8px 16px;
+    }
+
+    .task-item-sliding {
+      margin-bottom: 8px;
+    }
+
+    .task-item {
+      --background: var(--ion-item-background, #fff);
+      --border-radius: 8px;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+
+      &.completed {
+        opacity: 0.7;
+        .task-title {
+          text-decoration: line-through;
+        }
+      }
+
+      .task-checkbox {
+        --border-radius: 4px;
+        --size: 1.2;
+        transition: transform 0.3s ease;
+
+        &.checkbox-checked {
+          animation: checkBounce 0.3s ease;
+        }
+      }
+
+      .task-label {
+        padding: 8px 0;
+
+        .task-title {
+          font: 500 1rem "Inter", sans-serif;
+          margin: 0;
+        }
+
+        .task-description {
+          font: 0.875rem "Inter", sans-serif;
+          color: var(--ion-color-medium, #92949c);
+          margin: 4px 0;
+        }
+
+        .task-due {
+          font: 0.75rem "Inter", sans-serif;
+          color: var(--ion-color-dark, #222428);
+
+          &.overdue {
+            color: var(--ion-color-danger, #eb445a);
+          }
+        }
+      }
+    }
+
+    ion-item-options {
+      --border-radius: 8px;
+
+      ion-item-option {
+        --padding-start: 16px;
+        --padding-end: 16px;
+      }
+    }
+  }
+
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px;
+    text-align: center;
+
+    .empty-icon {
+      font-size: 32px;
+      color: var(--ion-color-medium, #92949c);
+      margin-bottom: 8px;
+    }
+
+    .empty-message {
+      font: 0.875rem "Inter", sans-serif;
+      color: var(--ion-color-medium, #92949c);
+      margin: 0;
+    }
+  }
+
+  ion-fab-button {
+    --background: var(--ion-color-primary, #3880ff);
+    --background-activated: var(--ion-color-primary-shade, #3171e0);
+  }
+}
+
+@keyframes checkBounce {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.3);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .task-content {
+    .task-item {
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
     }
   }
 }

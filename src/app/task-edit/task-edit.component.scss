@@ -1,130 +1,93 @@
 .task-edit-content {
- --background: var(--ion-color-light); // #f4f5f8 (light), #222428 (dark)
+  --background: var(--ion-background-color, #f4f5f8);
 
- .header-toolbar {
-   --background: var(--ion-color-primary); // #3880ff (light), #428cff (dark)
-   --color: var(--ion-color-primary-contrast); // #ffffff
- }
+  ion-toolbar {
+    --background: var(--ion-color-primary, #3880ff);
+    --color: var(--ion-color-primary-contrast, #fff);
+  }
 
- .header-title {
-   font-family: 'Segoe UI', sans-serif;
-   font-weight: 600;
-   font-size: 20px;
- }
+  ion-title {
+    font: 600 1.25rem "Inter", sans-serif;
+  }
 
- .save-icon-btn {
-   --padding-start: 10px;
-   --padding-end: 10px;
- }
+  ion-button[slot="end"] {
+    --padding-top: 8px;
+    --padding-end: 8px;
+  }
 
- form {
-   max-width: 600px; // Constrain width for larger screens
-   margin: 0 auto; // Center form
+  form {
+    ion-item {
+      --background: var(--ion-item-background, #fff);
+      --border-color: var(--ion-border-color, #d7d8da);
+      transition: transform 0.2s ease;
 
-   .form-item {
-     --background: var(--ion-item-background, #ffffff); // #ffffff (light), #1e1e1e/#000000 (dark)
-     --border-color: var(--ion-color-light-shade); // #d7d8da (light), #383a3e (dark)
-     margin-bottom: 16px;
-     border-radius: 8px;
-     transition: all 0.3s ease;
+      ion-label {
+        font: 0.9375rem "Inter", sans-serif;
+        color: var(--ion-text-color, #222428);
+      }
 
-     &.ng-animating {
-       animation: slideIn 0.3s ease-in-out;
-     }
+      ion-input {
+        --padding-top: 35px;
+        font: 0.9375rem "Inter", sans-serif;
 
-     .form-label {
-       font-family: 'Segoe UI', sans-serif;
-       font-size: 16px;
-       color: var(--ion-color-dark); // #222428 (light), #f4f5f8 (dark)
-     }
+        &.invalid {
+          --border-color: var(--ion-color-danger, #eb445a);
+        }
+      }
 
-     ion-input {
-       --padding-start: 12px;
-       --padding-end: 12px;
-       font-family: 'Segoe UI', sans-serif;
+      ion-textarea {
+        padding-top: 35px;
+        font: 0.9375rem "Inter", sans-serif;
+        border: 1px solid var(--ion-border-color);
+        border-radius: 4px;
+      }
 
-       &.invalid {
-         --border-color: var(--ion-color-danger); // #eb445a (light), #ff4961 (dark)
-       }
-     }
+      ion-datetime-button {
+        --color: var(--ion-color-primary, #3880ff);
+      }
+    }
 
-     ion-textarea {
-       --padding-start: 12px;
-       --padding-end: 12px;
-       font-family: 'Segoe UI', sans-serif;
-       border: 1px solid var(--ion-color-light-shade);
-       border-radius: 4px;
-     }
+    ion-text[color="danger"] {
+      font: 0.75rem "Inter", sans-serif;
+      padding-left: 12px;
+    }
 
-     .datetime-btn {
-       --color: var(--ion-color-primary); // #3880ff (light), #428cff (dark)
-     }
-   }
+    ion-modal {
+      --background: var(--ion-background-color);
+      --border-radius: 8px;
+      --max-width: 280px;
+    }
 
-   .form-note {
-     font-family: 'Segoe UI', sans-serif;
-     font-size: 12px;
-     padding-left: 16px;
-     margin-top: -12px;
-     margin-bottom: 12px;
-     display: block;
-     transition: opacity 0.2s ease-in-out;
-   }
+    ion-button {
+      font: 600 0.9375rem "Inter", sans-serif;
+      text-transform: none;
 
-   .datetime-modal {
-     --background: var(--ion-color-light); // Consistent with content bg
-     --border-radius: 8px;
-     --max-width: 300px;
-   }
+      &[type="submit"] {
+        --box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s ease;
 
-   .form-actions {
-     display: flex;
-     flex-direction: column;
-     gap: 12px;
+        &:not(:disabled) {
+          &:hover {
+            transform: scale(1.02);
+          }
+          &:active {
+            transform: scale(0.98);
+          }
+        }
+      }
 
-     .save-button {
-       --background: var(--ion-color-primary);
-       --background-activated: var(--ion-color-primary-shade);
-       --box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-       font-family: 'Segoe UI', sans-serif;
-       font-weight: 600;
-       text-transform: none;
-       transition: transform 0.2s ease;
-
-       &:hover:not(:disabled) {
-         transform: scale(1.02);
-       }
-
-       &:active:not(:disabled) {
-         transform: scale(0.98);
-       }
-     }
-
-     .cancel-button {
-       --color: var(--ion-color-medium); // #92949c (light), #989aa2 (dark)
-       --border-color: var(--ion-color-medium);
-       font-family: 'Segoe UI', sans-serif;
-       text-transform: none;
-     }
-   }
- }
-}
-
-@keyframes slideIn {
- from {
-   opacity: 0;
-   transform: translateY(10px);
- }
- to {
-   opacity: 1;
-   transform: translateY(0);
- }
+      &[fill="outline"] {
+        --color: var(--ion-color-medium, #92949c);
+        --border-color: var(--ion-color-medium);
+      }
+    }
+  }
 }
 
 @media (prefers-color-scheme: dark) {
- .task-edit-content {
-   .form-item {
-     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); // Darker shadow in dark mode
-   }
- }
+  .task-edit-content {
+    ion-item {
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+  }
 }
