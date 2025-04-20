@@ -8,6 +8,18 @@ const routes: Routes = [
     component: TabsPage,
     children: [
       {
+        path: 'auth',
+        loadChildren: () =>
+          import('../auth/auth.module').then((m) => m.AuthPageModule),
+      },
+      {
+        path: 'register',
+        loadChildren: () =>
+          import('../register/register.module').then(
+            (m) => m.RegisterPageModule
+          ),
+      },
+      {
         path: 'task-list',
         loadChildren: () =>
           import('../task-list/task-list.module').then((m) => m.TaskListModule),

@@ -1,0 +1,78 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-title>Login</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding auth-content">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Login</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <form
+    [formGroup]="authForm"
+    (ngSubmit)="onSubmit()"
+    novalidate
+    class="max-w-md mx-auto"
+  >
+    <ion-item lines="full" class="mb-4 rounded-lg">
+      <ion-label position="floating">Email</ion-label>
+      <ion-input
+        formControlName="email"
+        type="email"
+        required
+        placeholder="Enter your email"
+        [class.invalid]="authForm.get('email')?.invalid && authForm.get('email')?.touched"
+      ></ion-input>
+    </ion-item>
+    <ion-text
+      color="danger"
+      class="text-xs mb-4 block"
+      *ngIf="authForm.get('email')?.invalid && authForm.get('email')?.touched"
+    >
+      {{ authForm.get('email')?.errors?.['required'] ? 'Email is required' :
+      'Invalid email format' }}
+    </ion-text>
+
+    <ion-item lines="full" class="mb-4 rounded-lg">
+      <ion-label position="floating">Password</ion-label>
+      <ion-input
+        formControlName="password"
+        type="password"
+        required
+        placeholder="Enter your password"
+        [class.invalid]="authForm.get('password')?.invalid && authForm.get('password')?.touched"
+      ></ion-input>
+    </ion-item>
+    <ion-text
+      color="danger"
+      class="text-xs mb-4 block"
+      *ngIf="authForm.get('password')?.invalid && authForm.get('password')?.touched"
+    >
+      {{ authForm.get('password')?.errors?.['required'] ? 'Password is required'
+      : 'Minimum 6 characters' }}
+    </ion-text>
+
+    <div class="flex flex-col gap-3">
+      <ion-button
+        type="submit"
+        expand="block"
+        color="primary"
+        [disabled]="authForm.invalid || isLoading"
+      >
+        Login
+      </ion-button>
+      <ion-button
+        expand="block"
+        fill="outline"
+        color="medium"
+        (click)="goToRegister()"
+        [disabled]="isLoading"
+      >
+        Register
+      </ion-button>
+    </div>
+  </form>
+</ion-content>

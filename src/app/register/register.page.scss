@@ -1,0 +1,74 @@
+.auth-content {
+  --background: var(--ion-background-color, #f4f5f8);
+
+  ion-toolbar {
+    --background: var(--ion-color-primary, #3880ff);
+    --color: var(--ion-color-primary-contrast, #fff);
+  }
+
+  ion-title {
+    font: 600 1.25rem "Inter", sans-serif;
+  }
+
+  form {
+    padding-top: 16px;
+
+    ion-item {
+      --background: var(--ion-item-background, #fff);
+      --border-color: var(--ion-border-color, #d7d8da);
+      transition: transform 0.2s ease;
+
+      ion-label {
+        font: 0.9375rem "Inter", sans-serif;
+        color: var(--ion-text-color, #222428);
+      }
+
+      ion-input {
+        --padding-start: 10px;
+        --padding-end: 10px;
+        font: 0.9375rem "Inter", sans-serif;
+
+        &.invalid {
+          --border-color: var(--ion-color-danger, #eb445a);
+        }
+      }
+    }
+
+    ion-text[color="danger"] {
+      font: 0.75rem "Inter", sans-serif;
+      padding-left: 12px;
+    }
+
+    ion-button {
+      font: 600 0.9375rem "Inter", sans-serif;
+      text-transform: none;
+
+      &[type="submit"] {
+        --box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s ease;
+
+        &:not(:disabled) {
+          &:hover {
+            transform: scale(1.02);
+          }
+          &:active {
+            transform: scale(0.98);
+          }
+        }
+      }
+
+      &[fill="outline"] {
+        --color: var(--ion-color-medium, #92949c);
+        --border-color: var(--ion-color-medium);
+      }
+    }
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .auth-content {
+    ion-item {
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+  }
+}
