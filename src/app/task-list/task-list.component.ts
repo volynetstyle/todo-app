@@ -4,11 +4,12 @@ import {
   AlertController,
   NavController,
   AnimationController,
+  ToastController,
 } from '@ionic/angular';
-import { Observable, map } from 'rxjs';
+import { Observable, map, shareReplay } from 'rxjs';
 import { TaskService } from '../services/task.service';
+import { AuthService } from '../services/auth.service';
 import { Task } from '../models/task.model';
-import { shareReplay } from 'rxjs/operators';
 
 @Component({
   selector: 'app-task-list',
@@ -18,18 +19,24 @@ import { shareReplay } from 'rxjs/operators';
 })
 export class TaskListComponent implements OnInit {
   activeTasks$!: Observable<Task[]>;
-  completedTasks$!: Observable<Task[]>;
   currentDate: Date = new Date();
+  completedTasks$!: Observable<Task[]>;
 
   constructor(
     private taskService: TaskService,
+    private authService: AuthService,
     private alertController: AlertController,
     private router: Router,
     private navCtrl: NavController,
-    private animationCtrl: AnimationController
+    private animationCtrl: AnimationController,
+    private toastCtrl: ToastController
   ) {}
 
   ngOnInit() {
+    if (!this.authService.getCurrentUser()) {
+      this.router.navigate(['/auth']);
+      return;
+    }
     this.loadTasks();
   }
 
@@ -69,9 +76,18 @@ export class TaskListComponent implements OnInit {
           text: 'Delete',
           role: 'destructive',
           handler: async () => {
-            await this.animateDeletion(taskId);
-            await this.taskService.deleteTask(taskId);
-            if (slidingItem) slidingItem.close();
+            try {
+              await this.animateDeletion(taskId);
+              await this.taskService.deleteTask(taskId);
+              if (slidingItem) slidingItem.close();
+            } catch (error) {
+              const toast = await this.toastCtrl.create({
+                message: 'Failed to delete task.',
+                duration: 3000,
+                color: 'danger',
+              });
+              await toast.present();
+            }
           },
         },
       ],
@@ -80,8 +96,17 @@ export class TaskListComponent implements OnInit {
     await alert.present();
   }
 
-  toggleTaskCompletion(id: string) {
-    this.taskService.toggleTaskCompletion(id);
+  async toggleTaskCompletion(id: string) {
+    try {
+      await this.taskService.toggleTaskCompletion(id);
+    } catch (error) {
+      const toast = await this.toastCtrl.create({
+        message: 'Failed to update task.',
+        duration: 3000,
+        color: 'danger',
+      });
+      await toast.present();
+    }
   }
 
   private async animateDeletion(taskId: string): Promise<void> {

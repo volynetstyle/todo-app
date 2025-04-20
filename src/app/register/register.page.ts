@@ -23,7 +23,9 @@ export class RegisterPage implements OnInit {
     private toastCtrl: ToastController
   ) {
     this.registerForm = this.fb.group({
+      username: ['', [Validators.required, Validators.minLength(3)]],
       email: ['', [Validators.required, Validators.email]],
+      phoneNumber: ['', [Validators.pattern(/^\+?[1-9]\d{1,14}$/)]], // E.164 format
       password: ['', [Validators.required, Validators.minLength(6)]],
       confirmPassword: ['', [Validators.required, matchValidator('password')]],
     });
@@ -41,10 +43,11 @@ export class RegisterPage implements OnInit {
     await loading.present();
 
     try {
-      const { email, password } = this.registerForm.value;
-      await this.authService.signup(email, password);
+      const { email, password, username, phoneNumber } =
+        this.registerForm.value;
+      await this.authService.signup(email, password, username, phoneNumber);
       await loading.dismiss();
-      this.router.navigate(['/tabs/task-list'], { replaceUrl: true });
+      this.router.navigate(['/task-list'], { replaceUrl: true });
     } catch (error) {
       await loading.dismiss();
       this.isLoading = false;

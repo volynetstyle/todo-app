@@ -13,26 +13,42 @@ import {
 import { Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { addDoc, Timestamp } from 'firebase/firestore';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TaskService {
-  private readonly STORAGE_KEY = 'tasks';
+  constructor(private firestore: Firestore, private authService: AuthService) {}
 
-  constructor(private firestore: Firestore) {}
+  private getUserTasksCollection() {
+    const userId = this.authService.getCurrentUser()?.uid;
+    if (!userId) throw new Error('User not authenticated');
+    return collection(this.firestore, `users/${userId}/tasks`);
+  }
+
+  private getUserTaskDoc(id: string) {
+    const userId = this.authService.getCurrentUser()?.uid;
+    if (!userId) throw new Error('User not authenticated');
+    return doc(this.firestore, `users/${userId}/tasks`, id);
+  }
 
   getTasks(): Observable<Task[]> {
-    const tasksCollection = collection(this.firestore, this.STORAGE_KEY);
-    return (
-      collectionData(tasksCollection, { idField: 'id' }) as Observable<Task[]>
-    ).pipe(catchError(() => of([])));
+    try {
+      const tasksCollection = this.getUserTasksCollection();
+      return (
+        collectionData(tasksCollection, { idField: 'id' }) as Observable<Task[]>
+      ).pipe(catchError(() => of([])));
+    } catch (error) {
+      console.error('Failed to get tasks:', error);
+      return of([]);
+    }
   }
 
   async getTaskById(id: string): Promise<Task | undefined> {
     try {
       if (!id) return undefined;
-      const taskRef = doc(this.firestore, this.STORAGE_KEY, id);
+      const taskRef = this.getUserTaskDoc(id);
       const snapshot = await getDoc(taskRef);
       if (!snapshot.exists()) return undefined;
 
@@ -47,14 +63,15 @@ export class TaskService {
           ? (data['dueDate'] as Timestamp)?.toDate()
           : undefined,
       };
-    } catch {
+    } catch (error) {
+      console.error('Failed to get task:', error);
       return undefined;
     }
   }
 
   async addTask(task: Omit<Task, 'id' | 'createdAt'>): Promise<void> {
     try {
-      const tasksCollection = collection(this.firestore, this.STORAGE_KEY);
+      const tasksCollection = this.getUserTasksCollection();
       await addDoc(tasksCollection, {
         ...task,
         title: task.title || 'Untitled',
@@ -64,13 +81,14 @@ export class TaskService {
       });
     } catch (error) {
       console.error('Failed to add task:', error);
+      throw error;
     }
   }
 
   async updateTask(task: Task): Promise<void> {
     try {
       if (!task.id) return;
-      const taskRef = doc(this.firestore, this.STORAGE_KEY, task.id);
+      const taskRef = this.getUserTaskDoc(task.id);
       await setDoc(
         taskRef,
         {
@@ -86,29 +104,32 @@ export class TaskService {
       );
     } catch (error) {
       console.error('Failed to update task:', error);
+      throw error;
     }
   }
 
   async deleteTask(id: string): Promise<void> {
     try {
       if (!id) return;
-      const taskRef = doc(this.firestore, this.STORAGE_KEY, id);
+      const taskRef = this.getUserTaskDoc(id);
       await deleteDoc(taskRef);
     } catch (error) {
       console.error('Failed to delete task:', error);
+      throw error;
     }
   }
 
   async toggleTaskCompletion(id: string): Promise<void> {
     try {
       if (!id) return;
-      const taskRef = doc(this.firestore, this.STORAGE_KEY, id);
+      const taskRef = this.getUserTaskDoc(id);
       const snapshot = await getDoc(taskRef);
       if (!snapshot.exists()) return;
 
       await updateDoc(taskRef, { completed: !snapshot.data()['completed'] });
     } catch (error) {
       console.error('Failed to toggle task completion:', error);
+      throw error;
     }
   }
 }

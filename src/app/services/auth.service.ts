@@ -4,7 +4,10 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signOut,
+  authState,
 } from '@angular/fire/auth';
+import { Firestore, doc, setDoc } from '@angular/fire/firestore';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -12,7 +15,7 @@ import {
 export class AuthService {
   private readonly USER_ID_KEY = 'userId';
 
-  constructor(private auth: Auth) {}
+  constructor(private auth: Auth, private firestore: Firestore) {}
 
   async login(email: string, password: string): Promise<void> {
     try {
@@ -29,15 +32,27 @@ export class AuthService {
     }
   }
 
-  async signup(email: string, password: string): Promise<void> {
+  async signup(
+    email: string,
+    password: string,
+    username: string,
+    phoneNumber?: string
+  ): Promise<void> {
     try {
       const userCredential = await createUserWithEmailAndPassword(
         this.auth,
         email,
         password
       );
-      if (userCredential.user?.uid) {
-        localStorage.setItem(this.USER_ID_KEY, userCredential.user.uid);
+      const uid = userCredential.user?.uid;
+      if (uid) {
+        localStorage.setItem(this.USER_ID_KEY, uid);
+        await setDoc(doc(this.firestore, 'users', uid), {
+          email,
+          username,
+          phoneNumber: phoneNumber || null,
+          createdAt: new Date(),
+        });
       }
     } catch (error) {
       throw new Error('Signup failed: ' + (error as Error).message);

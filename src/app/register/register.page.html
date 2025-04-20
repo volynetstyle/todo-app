@@ -24,6 +24,25 @@
     class="max-w-md mx-auto"
   >
     <ion-item lines="full" class="mb-4 rounded-lg">
+      <ion-label position="floating">Username</ion-label>
+      <ion-input
+        formControlName="username"
+        type="text"
+        required
+        placeholder="Enter your username"
+        [class.invalid]="registerForm.get('username')?.invalid && registerForm.get('username')?.touched"
+      ></ion-input>
+    </ion-item>
+    <ion-text
+      color="danger"
+      class="text-xs mb-4 block"
+      *ngIf="registerForm.get('username')?.invalid && registerForm.get('username')?.touched"
+    >
+      {{ registerForm.get('username')?.errors?.['required'] ? 'Username is
+      required' : 'Minimum 3 characters' }}
+    </ion-text>
+
+    <ion-item lines="full" class="mb-4 rounded-lg">
       <ion-label position="floating">Email</ion-label>
       <ion-input
         formControlName="email"
@@ -40,6 +59,23 @@
     >
       {{ registerForm.get('email')?.errors?.['required'] ? 'Email is required' :
       'Invalid email format' }}
+    </ion-text>
+
+    <ion-item lines="full" class="mb-4 rounded-lg">
+      <ion-label position="floating">Phone Number</ion-label>
+      <ion-input
+        formControlName="phoneNumber"
+        type="tel"
+        placeholder="Enter your phone number"
+        [class.invalid]="registerForm.get('phoneNumber')?.invalid && registerForm.get('phoneNumber')?.touched"
+      ></ion-input>
+    </ion-item>
+    <ion-text
+      color="danger"
+      class="text-xs mb-4 block"
+      *ngIf="registerForm.get('phoneNumber')?.invalid && registerForm.get('phoneNumber')?.touched"
+    >
+      Invalid phone number format
     </ion-text>
 
     <ion-item lines="full" class="mb-4 rounded-lg">
