@@ -9,8 +9,15 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { NavController, ToastController } from '@ionic/angular';
 import { TaskService } from '../services/task.service';
 import { Task } from '../models/task.model';
-import { v4 as uuidv4 } from 'uuid';
-import cleanObject from '../utils/cleanObject';
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
+import {
+  Storage,
+  ref,
+  uploadString,
+  getDownloadURL,
+} from '@angular/fire/storage';
+import { AuthService } from '../services/auth.service';
+import { Haptics } from '@capacitor/haptics';
 
 @Component({
   selector: 'app-task-edit',
@@ -25,7 +32,10 @@ export class TaskEditComponent implements OnInit {
   pageTitle = 'New Task';
   maxDate: string = new Date(
     new Date().setFullYear(new Date().getFullYear() + 5)
-  ).toISOString(); // 5 years ahead
+  ).toISOString();
+  saving = false;
+  photoUrl: string | null = null;
+  photoBase64: string | null = null;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -33,7 +43,9 @@ export class TaskEditComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private navCtrl: NavController,
-    private toastCtrl: ToastController
+    private toastCtrl: ToastController,
+    private storage: Storage,
+    private authService: AuthService
   ) {
     this.taskForm = this.formBuilder.group({
       title: ['', [Validators.required, Validators.minLength(3)]],
@@ -63,53 +75,100 @@ export class TaskEditComponent implements OnInit {
       this.taskForm.patchValue({
         title: task.title,
         description: task.description,
-        dueDate: task.dueDate
-          ? task.dueDate.toISOString().substring(0, 10)
-          : null, // Format to yyyy-MM-dd if needed
+        dueDate: task.dueDate ? new Date(task.dueDate).toISOString() : null,
         completed: task.completed,
       });
+      this.photoUrl = task.photoUrl || null;
     } else {
       await this.showToast('Task not found');
       this.navCtrl.back();
     }
   }
 
+  async takePhoto() {
+    try {
+      const photo = await Camera.getPhoto({
+        resultType: CameraResultType.Base64,
+        source: CameraSource.Camera,
+        quality: 90,
+      });
+      if (photo.base64String) {
+        this.photoBase64 = photo.base64String;
+        this.photoUrl = `data:image/jpeg;base64,${photo.base64String}`;
+      }
+    } catch {
+      await this.showToast('Failed to take photo');
+    }
+  }
+
+  async pickPhoto() {
+    try {
+      const photo = await Camera.getPhoto({
+        resultType: CameraResultType.Base64,
+        source: CameraSource.Photos,
+        quality: 90,
+      });
+      if (photo.base64String) {
+        this.photoBase64 = photo.base64String;
+        this.photoUrl = `data:image/jpeg;base64,${photo.base64String}`;
+      }
+    } catch {
+      await this.showToast('Failed to pick photo');
+    }
+  }
+
   async saveTask(): Promise<void> {
-    if (this.taskForm.valid) {
-      const formValues = this.taskForm.value;
+    if (this.taskForm.invalid || this.saving) return;
 
-      const dueDate = formValues.dueDate
-        ? new Date(formValues.dueDate)
-        : undefined;
+    this.saving = true;
+    try {
+      const user = this.authService.getCurrentUser();
+      if (!user) throw new Error('User not authenticated');
 
-      if (this.isNewTask) {
-        const newTask: Task = {
-          id: uuidv4(),
-          createdAt: new Date(),
-          title: formValues.title,
-          description: formValues.description,
-          completed: formValues.completed,
-          dueDate,
-        };
-        const { id, createdAt, ...taskData } = newTask;
-        await this.taskService.addTask(taskData);
-        await this.showToast('Task created successfully');
-      } else if (this.taskId) {
-        const existingTask = await this.taskService.getTaskById(this.taskId);
-        if (existingTask) {
-          const updatedTask: Task = {
-            ...existingTask,
-            ...formValues,
-            dueDate,
-          };
-          await this.taskService.updateTask(updatedTask);
-          await this.showToast('Task updated successfully');
-        } else {
-          await this.showToast('Task not found');
-        }
+      let photoUrl: string | null = this.photoUrl;
+
+      if (this.photoBase64) {
+        const fileName = `${crypto.randomUUID()}.jpg`;
+        const storageRef = ref(this.storage, `tasks/${user.uid}/${fileName}`);
+        const fullDataUrl = `data:image/jpeg;base64,${this.photoBase64}`;
+
+        console.log(fileName, storageRef, fullDataUrl);
+
+        await uploadString(storageRef, fullDataUrl, 'data_url');
+        photoUrl = await getDownloadURL(storageRef);
       }
 
-      this.navCtrl.navigateBack('/tabs/task-list');
+      const formValues = this.taskForm.value;
+      const task: Task = {
+        title: formValues.title,
+        description: formValues.description,
+        completed: formValues.completed,
+        dueDate: formValues.dueDate ? new Date(formValues.dueDate) : null,
+        photoUrl,
+        id: '',
+        createdAt: new Date(),
+      };
+
+      if (this.isNewTask) {
+        await this.taskService.addTask(task);
+        await Haptics.vibrate({ duration: 50 });
+        await this.showToast('Task created successfully');
+      } else if (this.taskId) {
+        const { id, ...taskWithoutId } = task;
+        await this.taskService.updateTask({
+          id: this.taskId,
+          ...taskWithoutId,
+        });
+        await Haptics.vibrate({ duration: 50 });
+        await this.showToast('Task updated successfully');
+      }
+
+      this.navCtrl.navigateBack('/task-list');
+    } catch (error) {
+      console.log(error);
+      await this.showToast('Failed to save task');
+    } finally {
+      this.saving = false;
     }
   }
 
@@ -118,6 +177,7 @@ export class TaskEditComponent implements OnInit {
       message,
       duration: 2000,
       position: 'bottom',
+      color: 'danger',
     });
     await toast.present();
   }

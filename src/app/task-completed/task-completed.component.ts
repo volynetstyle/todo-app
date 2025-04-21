@@ -10,7 +10,7 @@ import { TaskService } from '../services/task.service';
   styleUrls: ['./task-completed.component.scss'],
   standalone: false,
 })
-export class TaskCompletedComponent  implements OnInit {
+export class TaskCompletedComponent implements OnInit {
   completedTasks$!: Observable<Task[]>;
 
   constructor(
@@ -20,7 +20,10 @@ export class TaskCompletedComponent  implements OnInit {
 
   ngOnInit() {
     this.completedTasks$ = this.taskService.getTasks().pipe(
-      map(tasks => tasks.filter(task => task.completed))
+      map((tasks) =>
+        tasks.map((task) => this.taskService.convertTimestamp(task))
+      ),
+      map((tasks) => tasks.filter((task) => task.completed))
     );
   }
 
@@ -31,16 +34,16 @@ export class TaskCompletedComponent  implements OnInit {
       buttons: [
         {
           text: 'Cancel',
-          role: 'cancel'
+          role: 'cancel',
         },
         {
           text: 'Delete',
           role: 'destructive',
           handler: () => {
             this.taskService.deleteTask(taskId);
-          }
-        }
-      ]
+          },
+        },
+      ],
     });
 
     await alert.present();

@@ -4,5 +4,6 @@ export interface Task {
   description: string;
   completed: boolean;
   createdAt: Date;
-  dueDate?: Date;
+  dueDate?: Date | null;
+  photoUrl?: string | null;
 }

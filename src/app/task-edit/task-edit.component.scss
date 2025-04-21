@@ -1,93 +1,45 @@
-.task-edit-content {
+.ion-padding {
   --background: var(--ion-background-color, #f4f5f8);
+}
 
-  ion-toolbar {
-    --background: var(--ion-color-primary, #3880ff);
-    --color: var(--ion-color-primary-contrast, #fff);
-  }
+ion-item {
+  --background: var(--ion-item-background, #fff);
+  margin-bottom: 16px;
+  border-radius: 8px;
+}
 
-  ion-title {
-    font: 600 1.25rem "Inter", sans-serif;
-  }
+ion-label {
+  font: 0.875rem 'Inter', sans-serif;
+}
 
-  ion-button[slot="end"] {
-    --padding-top: 8px;
-    --padding-end: 8px;
-  }
+ion-input,
+ion-textarea {
+  font: 1rem 'Inter', sans-serif;
+}
 
-  form {
-    ion-item {
-      --background: var(--ion-item-background, #fff);
-      --border-color: var(--ion-border-color, #d7d8da);
-      transition: transform 0.2s ease;
+.task-photo {
+  max-width: 100%;
+  max-height: 200px;
+  margin: 16px 0;
+  border-radius: 8px;
+  object-fit: cover;
+}
 
-      ion-label {
-        font: 0.9375rem "Inter", sans-serif;
-        color: var(--ion-text-color, #222428);
-      }
+ion-button {
+  font: 600 0.9375rem 'Inter', sans-serif;
+  text-transform: none;
+}
 
-      ion-input {
-        --padding-top: 35px;
-        font: 0.9375rem "Inter", sans-serif;
-
-        &.invalid {
-          --border-color: var(--ion-color-danger, #eb445a);
-        }
-      }
-
-      ion-textarea {
-        padding-top: 35px;
-        font: 0.9375rem "Inter", sans-serif;
-        border: 1px solid var(--ion-border-color);
-        border-radius: 4px;
-      }
-
-      ion-datetime-button {
-        --color: var(--ion-color-primary, #3880ff);
-      }
-    }
-
-    ion-text[color="danger"] {
-      font: 0.75rem "Inter", sans-serif;
-      padding-left: 12px;
-    }
-
-    ion-modal {
-      --background: var(--ion-background-color);
-      --border-radius: 8px;
-      --max-width: 280px;
-    }
-
-    ion-button {
-      font: 600 0.9375rem "Inter", sans-serif;
-      text-transform: none;
-
-      &[type="submit"] {
-        --box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        transition: transform 0.2s ease;
-
-        &:not(:disabled) {
-          &:hover {
-            transform: scale(1.02);
-          }
-          &:active {
-            transform: scale(0.98);
-          }
-        }
-      }
-
-      &[fill="outline"] {
-        --color: var(--ion-color-medium, #92949c);
-        --border-color: var(--ion-color-medium);
-      }
-    }
-  }
+ion-text[color="danger"] {
+  font: 0.75rem 'Inter', sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
-  .task-edit-content {
-    ion-item {
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-    }
+  .ion-padding {
+    --background: var(--ion-background-color, #121212);
+  }
+
+  ion-item {
+    --background: var(--ion-item-background, #1c1c1e);
   }
 }

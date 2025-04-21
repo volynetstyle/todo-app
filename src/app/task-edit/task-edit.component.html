@@ -10,7 +10,7 @@
     <ion-buttons slot="end">
       <ion-button
         (click)="saveTask()"
-        [disabled]="taskForm.invalid"
+        [disabled]="taskForm.invalid || saving"
         aria-label="Save"
       >
         <ion-icon slot="icon-only" name="save-outline"></ion-icon>
@@ -72,6 +72,27 @@
       </ion-modal>
     </ion-item>
 
+    <ion-item lines="full" class="mb-4 rounded-lg">
+      <ion-label>Photo</ion-label>
+      <ion-button
+        type="button"
+        fill="clear"
+        (click)="takePhoto()"
+        aria-label="Take Photo"
+      >
+        <ion-icon name="camera"></ion-icon>
+      </ion-button>
+      <ion-button
+        type="button"
+        fill="clear"
+        (click)="pickPhoto()"
+        aria-label="Pick Photo"
+      >
+        <ion-icon name="images"></ion-icon>
+      </ion-button>
+    </ion-item>
+    <ion-img *ngIf="photoUrl" [src]="photoUrl" class="task-photo"></ion-img>
+
     <ion-item lines="none" class="mb-4">
       <ion-label>Completed</ion-label>
       <ion-toggle
@@ -86,7 +107,7 @@
         type="submit"
         expand="block"
         color="primary"
-        [disabled]="taskForm.invalid"
+        [disabled]="taskForm.invalid || saving"
       >
         Save
       </ion-button>

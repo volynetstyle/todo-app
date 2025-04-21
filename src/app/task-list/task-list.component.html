@@ -11,131 +11,164 @@
     </ion-toolbar>
   </ion-header>
 
-  <ng-container *ngIf="activeTasks$ | async as activeTasks">
-    <ion-list class="task-list">
-      <ion-list-header>
-        <ion-label class="section-header">Active Tasks</ion-label>
-      </ion-list-header>
-      <ng-container *ngIf="activeTasks.length > 0; else noActiveTasks">
-        <ion-item-sliding
-          *ngFor="let task of activeTasks; let i = index"
-          #slidingItem
-          [attr.task-id]="task.id"
-        >
-          <ion-item
-            (click)="editTask(task.id)"
-            class="task-item"
-            [class.completed]="task.completed"
-          >
-            <ion-checkbox
-              slot="start"
-              [checked]="task.completed"
-              (ionChange)="toggleTaskCompletion(task.id)"
-              class="task-checkbox"
-            ></ion-checkbox>
-            <ion-label class="task-label">
-              <h2 class="task-title">{{ task.title }}</h2>
-              <p class="task-description" *ngIf="task.description">
-                {{ task.description }}
-              </p>
-              <p
-                class="task-due"
-                *ngIf="task.dueDate"
-                [class.overdue]="task.dueDate < currentDate"
+  <ng-container *ngIf="isOnline; else offline">
+    <ng-container *ngIf="isAuthenticated; else authenticating">
+      <ng-container *ngIf="activeTasks$ | async as activeTasks">
+        <ion-list class="task-list">
+          <ion-list-header>
+            <ion-label class="section-header">Active Tasks</ion-label>
+          </ion-list-header>
+          <ng-container *ngIf="activeTasks.length > 0; else noActiveTasks">
+            <ion-item-sliding
+              *ngFor="let task of activeTasks; let i = index"
+              #slidingItem
+              [attr.task-id]="task.id"
+            >
+              <ion-item
+                (click)="editTask(task.id)"
+                class="task-item"
+                [class.completed]="task.completed"
               >
-                Due: {{ task.dueDate | date : "mediumDate" }}
-              </p>
-            </ion-label>
-          </ion-item>
-          <ion-item-options side="end">
-            <ion-item-option
-              color="primary"
-              (click)="editTask(task.id); slidingItem.close()"
-            >
-              <ion-icon slot="icon-only" name="create-outline"></ion-icon>
-            </ion-item-option>
-            <ion-item-option
-              color="danger"
-              (click)="confirmDelete(task.id, slidingItem)"
-            >
-              <ion-icon slot="icon-only" name="trash"></ion-icon>
-            </ion-item-option>
-          </ion-item-options>
-        </ion-item-sliding>
+                <ion-checkbox
+                  slot="start"
+                  [checked]="task.completed"
+                  (ionChange)="toggleTaskCompletion(task.id)"
+                  class="task-checkbox"
+                ></ion-checkbox>
+                <ion-label class="task-label">
+                  <h2 class="task-title">{{ task.title }}</h2>
+                  <p class="task-description" *ngIf="task.description">
+                    {{ task.description }}
+                  </p>
+                  <p
+                    class="task-due"
+                    *ngIf="task.dueDate"
+                    [class.overdue]="task.dueDate < currentDate"
+                  >
+                    Due: {{ task.dueDate | date : "mediumDate" }}
+                  </p>
+                  <ion-img
+                    *ngIf="task.photoUrl"
+                    [src]="task.photoUrl"
+                    class="task-photo"
+                  ></ion-img>
+                </ion-label>
+              </ion-item>
+              <ion-item-options side="end">
+                <ion-item-option
+                  color="primary"
+                  (click)="editTask(task.id); slidingItem.close()"
+                >
+                  <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+                </ion-item-option>
+                <ion-item-option
+                  color="danger"
+                  (click)="confirmDelete(task.id, slidingItem)"
+                >
+                  <ion-icon slot="icon-only" name="trash"></ion-icon>
+                </ion-item-option>
+              </ion-item-options>
+            </ion-item-sliding>
+          </ng-container>
+          <ng-template #noActiveTasks>
+            <div class="empty-state">
+              <ion-icon name="list-outline" class="empty-icon"></ion-icon>
+              <p class="empty-message">No active tasks</p>
+            </div>
+          </ng-template>
+        </ion-list>
       </ng-container>
-      <ng-template #noActiveTasks>
-        <div class="empty-state">
-          <ion-icon name="list-outline" class="empty-icon"></ion-icon>
-          <p class="empty-message">No active tasks</p>
-        </div>
-      </ng-template>
-    </ion-list>
+
+      <ng-container *ngIf="completedTasks$ | async as completedTasks">
+        <ion-list class="task-list">
+          <ion-list-header>
+            <ion-label class="section-header">Completed Tasks</ion-label>
+          </ion-list-header>
+          <ng-container
+            *ngIf="completedTasks.length > 0; else noCompletedTasks"
+          >
+            <ion-item-sliding
+              *ngFor="let task of completedTasks; let i = index"
+              #slidingItem
+              [attr.task-id]="task.id"
+            >
+              <ion-item
+                (click)="editTask(task.id)"
+                class="task-item"
+                [class.completed]="task.completed"
+              >
+                <ion-checkbox
+                  slot="start"
+                  [checked]="task.completed"
+                  (ionChange)="toggleTaskCompletion(task.id)"
+                  class="task-checkbox"
+                ></ion-checkbox>
+                <ion-label class="task-label">
+                  <h2 class="task-title">{{ task.title }}</h2>
+                  <p class="task-description" *ngIf="task.description">
+                    {{ task.description }}
+                  </p>
+                  <p
+                    class="task-due"
+                    *ngIf="task.dueDate"
+                    [class.overdue]="task.dueDate < currentDate"
+                  >
+                    Due: {{ task.dueDate | date : "mediumDate" }}
+                  </p>
+                  <ion-img
+                    *ngIf="task.photoUrl"
+                    [src]="task.photoUrl"
+                    class="task-photo"
+                  ></ion-img>
+                </ion-label>
+              </ion-item>
+              <ion-item-options side="end">
+                <ion-item-option
+                  color="primary"
+                  (click)="editTask(task.id); slidingItem.close()"
+                >
+                  <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+                </ion-item-option>
+                <ion-item-option
+                  color="danger"
+                  (click)="confirmDelete(task.id, slidingItem)"
+                >
+                  <ion-icon slot="icon-only" name="trash"></ion-icon>
+                </ion-item-option>
+              </ion-item-options>
+            </ion-item-sliding>
+          </ng-container>
+          <ng-template #noCompletedTasks>
+            <div class="empty-state">
+              <ion-icon name="list-outline" class="empty-icon"></ion-icon>
+              <p class="empty-message">No completed tasks</p>
+            </div>
+          </ng-template>
+        </ion-list>
+      </ng-container>
+
+      <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+        <ion-fab-button (click)="addTask()">
+          <ion-icon name="add"></ion-icon>
+        </ion-fab-button>
+      </ion-fab>
+    </ng-container>
   </ng-container>
 
-  <ng-container *ngIf="completedTasks$ | async as completedTasks">
-    <ion-list class="task-list">
-      <ion-list-header>
-        <ion-label class="section-header">Completed Tasks</ion-label>
-      </ion-list-header>
-      <ng-container *ngIf="completedTasks.length > 0; else noCompletedTasks">
-        <ion-item-sliding
-          *ngFor="let task of completedTasks; let i = index"
-          #slidingItem
-          [attr.task-id]="task.id"
-        >
-          <ion-item
-            (click)="editTask(task.id)"
-            class="task-item"
-            [class.completed]="task.completed"
-          >
-            <ion-checkbox
-              slot="start"
-              [checked]="task.completed"
-              (ionChange)="toggleTaskCompletion(task.id)"
-              class="task-checkbox"
-            ></ion-checkbox>
-            <ion-label class="task-label">
-              <h2 class="task-title">{{ task.title }}</h2>
-              <p class="task-description" *ngIf="task.description">
-                {{ task.description }}
-              </p>
-              <p
-                class="task-due"
-                *ngIf="task.dueDate"
-                [class.overdue]="task.dueDate < currentDate"
-              >
-                Due: {{ task.dueDate | date : "mediumDate" }}
-              </p>
-            </ion-label>
-          </ion-item>
-          <ion-item-options side="end">
-            <ion-item-option
-              color="primary"
-              (click)="editTask(task.id); slidingItem.close()"
-            >
-              <ion-icon slot="icon-only" name="create-outline"></ion-icon>
-            </ion-item-option>
-            <ion-item-option
-              color="danger"
-              (click)="confirmDelete(task.id, slidingItem)"
-            >
-              <ion-icon slot="icon-only" name="trash"></ion-icon>
-            </ion-item-option>
-          </ion-item-options>
-        </ion-item-sliding>
-      </ng-container>
-      <ng-template #noCompletedTasks>
-        <div class="empty-state">
-          <ion-icon name="list-outline" class="empty-icon"></ion-icon>
-          <p class="empty-message">No completed tasks</p>
-        </div>
-      </ng-template>
-    </ion-list>
-  </ng-container>
+  <ng-template #authenticating>
+    <div class="authenticating-state">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Authenticating...</p>
+    </div>
+  </ng-template>
 
-  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ion-fab-button (click)="addTask()">
-      <ion-icon name="add"></ion-icon>
-    </ion-fab-button>
-  </ion-fab>
+  <ng-template #offline>
+    <div class="offline-state">
+      <ion-icon name="cloud-offline-outline" class="offline-icon"></ion-icon>
+      <p class="offline-message">No Internet Connection</p>
+      <p class="offline-submessage">
+        Please connect to the internet to use the app.
+      </p>
+    </div>
+  </ng-template>
 </ion-content>

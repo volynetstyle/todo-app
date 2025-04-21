@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { Task } from '../models/task.model';
 import {
   Firestore,
   collection,
@@ -9,10 +8,12 @@ import {
   deleteDoc,
   updateDoc,
   getDoc,
+  addDoc,
+  Timestamp,
 } from '@angular/fire/firestore';
 import { Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { addDoc, Timestamp } from 'firebase/firestore';
+import { Task } from '../models/task.model';
 import { AuthService } from './auth.service';
 
 @Injectable({
@@ -61,7 +62,8 @@ export class TaskService {
         createdAt: (data['createdAt'] as Timestamp)?.toDate() || new Date(),
         dueDate: data['dueDate']
           ? (data['dueDate'] as Timestamp)?.toDate()
-          : undefined,
+          : null,
+        photoUrl: data['photoUrl'] || null,
       };
     } catch (error) {
       console.error('Failed to get task:', error);
@@ -69,15 +71,17 @@ export class TaskService {
     }
   }
 
-  async addTask(task: Omit<Task, 'id' | 'createdAt'>): Promise<void> {
+  async addTask(task: Omit<Task, 'id'>): Promise<void> {
     try {
       const tasksCollection = this.getUserTasksCollection();
       await addDoc(tasksCollection, {
         ...task,
         title: task.title || 'Untitled',
         description: task.description || '',
-        completed: false,
+        completed: task.completed || false,
         createdAt: Timestamp.now(),
+        dueDate: task.dueDate ? Timestamp.fromDate(task.dueDate) : null,
+        photoUrl: task.photoUrl || null,
       });
     } catch (error) {
       console.error('Failed to add task:', error);
@@ -99,6 +103,7 @@ export class TaskService {
             ? Timestamp.fromDate(task.createdAt)
             : Timestamp.now(),
           dueDate: task.dueDate ? Timestamp.fromDate(task.dueDate) : null,
+          photoUrl: task.photoUrl || null,
         },
         { merge: true }
       );
@@ -131,5 +136,15 @@ export class TaskService {
       console.error('Failed to toggle task completion:', error);
       throw error;
     }
+  }
+
+  convertTimestamp(task: any): Task {
+    return {
+      ...task,
+      dueDate:
+        task.dueDate instanceof Timestamp
+          ? task.dueDate.toDate()
+          : task.dueDate,
+    };
   }
 }
