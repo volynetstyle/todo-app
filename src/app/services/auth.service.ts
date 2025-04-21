@@ -7,6 +7,7 @@ import {
   authState,
 } from '@angular/fire/auth';
 import { Firestore, doc, setDoc } from '@angular/fire/firestore';
+import { sendPasswordResetEmail } from 'firebase/auth';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -65,6 +66,14 @@ export class AuthService {
       localStorage.removeItem(this.USER_ID_KEY);
     } catch (error) {
       throw new Error('Logout failed: ' + (error as Error).message);
+    }
+  }
+
+  async resetPassword(email: string): Promise<void> {
+    try {
+      await sendPasswordResetEmail(this.auth, email);
+    } catch (error) {
+      throw error;
     }
   }
 

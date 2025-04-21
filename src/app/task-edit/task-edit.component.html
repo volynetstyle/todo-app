@@ -10,7 +10,7 @@
     <ion-buttons slot="end">
       <ion-button
         (click)="saveTask()"
-        [disabled]="taskForm.invalid || saving"
+        [disabled]="taskForm.invalid || saving || !isOnline"
         aria-label="Save"
       >
         <ion-icon slot="icon-only" name="save-outline"></ion-icon>
@@ -20,105 +20,164 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  <form
-    [formGroup]="taskForm"
-    (ngSubmit)="saveTask()"
-    novalidate
-    class="max-w-md mx-auto"
-  >
-    <ion-item lines="full" class="mb-4 rounded-lg">
-      <ion-label position="floating">Title</ion-label>
-      <ion-input
-        formControlName="title"
-        type="text"
-        required
-        placeholder="Task title"
-        [class.invalid]="
-          taskForm.get('title')?.invalid && taskForm.get('title')?.touched
-        "
-      ></ion-input>
-    </ion-item>
-    <ion-text
-      *ngIf="taskForm.get('title')?.invalid && taskForm.get('title')?.touched"
-      color="danger"
-      class="text-xs mb-4 block"
+  <ng-container *ngIf="isOnline; else offline">
+    <form
+      [formGroup]="taskForm"
+      (ngSubmit)="saveTask()"
+      novalidate
+      class="max-w-md mx-auto"
     >
-      {{ taskForm.get('title')?.errors?.['required'] ? 'Title is required' : 'Minimum 3 characters' }}
-    </ion-text>
-
-    <ion-item lines="full" class="mb-4 rounded-lg">
-      <ion-label position="floating">Description</ion-label>
-      <ion-textarea
-        formControlName="description"
-        rows="3"
-        placeholder="Details (optional)"
-        auto-grow
-      ></ion-textarea>
-    </ion-item>
-
-    <ion-item lines="full" class="mb-4 rounded-lg">
-      <ion-label>Due Date</ion-label>
-      <ion-datetime-button datetime="datetime"></ion-datetime-button>
-      <ion-modal [keepContentsMounted]="true">
-        <ng-template>
-          <ion-datetime
-            id="datetime"
-            formControlName="dueDate"
-            presentation="date"
-            [max]="maxDate"
-            showDefaultButtons
-          ></ion-datetime>
-        </ng-template>
-      </ion-modal>
-    </ion-item>
-
-    <ion-item lines="full" class="mb-4 rounded-lg">
-      <ion-label>Photo</ion-label>
-      <ion-button
-        type="button"
-        fill="clear"
-        (click)="takePhoto()"
-        aria-label="Take Photo"
+      <ion-item lines="full" class="mb-4 rounded-lg">
+        <ion-label position="floating">Title</ion-label>
+        <ion-input
+          formControlName="title"
+          type="text"
+          required
+          placeholder="Task title"
+          [class.invalid]="
+            taskForm.get('title')?.invalid && taskForm.get('title')?.touched
+          "
+          [disabled]="!isOnline"
+        ></ion-input>
+        <ion-button
+          slot="end"
+          fill="clear"
+          (click)="startVoiceInput('title')"
+          [disabled]="!isOnline"
+          aria-label="Voice input for title"
+        >
+          <ion-icon
+            [name]="
+              isListening && voiceTargetField === 'title'
+                ? 'mic'
+                : 'mic-outline'
+            "
+            [color]="
+              isListening && voiceTargetField === 'title' ? 'danger' : 'medium'
+            "
+          ></ion-icon>
+        </ion-button>
+      </ion-item>
+      <ion-text
+        *ngIf="taskForm.get('title')?.invalid && taskForm.get('title')?.touched"
+        color="danger"
+        class="text-xs mb-4 block"
       >
-        <ion-icon name="camera"></ion-icon>
-      </ion-button>
-      <ion-button
-        type="button"
-        fill="clear"
-        (click)="pickPhoto()"
-        aria-label="Pick Photo"
-      >
-        <ion-icon name="images"></ion-icon>
-      </ion-button>
-    </ion-item>
-    <ion-img *ngIf="photoUrl" [src]="photoUrl" class="task-photo"></ion-img>
+        {{ taskForm.get('title')?.errors?.['required'] ? 'Title is required' : 'Minimum 3 characters' }}
+      </ion-text>
 
-    <ion-item lines="none" class="mb-4">
-      <ion-label>Completed</ion-label>
-      <ion-toggle
-        formControlName="completed"
-        slot="end"
-        color="success"
-      ></ion-toggle>
-    </ion-item>
+      <ion-item lines="full" class="mb-4 rounded-lg">
+        <ion-label position="floating">Description</ion-label>
+        <ion-textarea
+          formControlName="description"
+          rows="3"
+          placeholder="Details (optional)"
+          auto-grow
+          [disabled]="!isOnline"
+        ></ion-textarea>
+        <ion-button
+          slot="end"
+          fill="clear"
+          (click)="startVoiceInput('description')"
+          [disabled]="!isOnline"
+          aria-label="Voice input for description"
+        >
+          <ion-icon
+            [name]="
+              isListening && voiceTargetField === 'description'
+                ? 'mic'
+                : 'mic-outline'
+            "
+            [color]="
+              isListening && voiceTargetField === 'description'
+                ? 'danger'
+                : 'medium'
+            "
+          ></ion-icon>
+        </ion-button>
+      </ion-item>
 
-    <div class="flex flex-col gap-3 pt-4">
-      <ion-button
-        type="submit"
-        expand="block"
-        color="primary"
-        [disabled]="taskForm.invalid || saving"
-      >
-        Save
-      </ion-button>
-      <ion-button
-        expand="block"
-        fill="outline"
-        color="medium"
-        (click)="cancel()"
-      >
-        Cancel
-      </ion-button>
+      <ion-item lines="full" class="mb-4 rounded-lg">
+        <ion-label>Due Date</ion-label>
+        <ion-datetime-button
+          datetime="datetime"
+          [disabled]="!isOnline"
+        ></ion-datetime-button>
+        <ion-modal [keepContentsMounted]="true">
+          <ng-template>
+            <ion-datetime
+              id="datetime"
+              formControlName="dueDate"
+              presentation="date"
+              [max]="maxDate"
+              showDefaultButtons
+              [disabled]="!isOnline"
+            ></ion-datetime>
+          </ng-template>
+        </ion-modal>
+      </ion-item>
+
+      <ion-item lines="full" class="mb-4 rounded-lg">
+        <ion-label>Photo</ion-label>
+        <ion-button
+          type="button"
+          fill="clear"
+          (click)="takePhoto()"
+          aria-label="Take Photo"
+          [disabled]="!isOnline"
+        >
+          <ion-icon name="camera"></ion-icon>
+        </ion-button>
+        <ion-button
+          type="button"
+          fill="clear"
+          (click)="pickPhoto()"
+          aria-label="Pick Photo"
+          [disabled]="!isOnline"
+        >
+          <ion-icon name="images"></ion-icon>
+        </ion-button>
+      </ion-item>
+      <ion-img *ngIf="photoUrl" [src]="photoUrl" class="task-photo"></ion-img>
+
+      <ion-item lines="none" class="mb-4">
+        <ion-label>Completed</ion-label>
+        <ion-toggle
+          formControlName="completed"
+          slot="end"
+          color="success"
+          [disabled]="!isOnline"
+        ></ion-toggle>
+      </ion-item>
+
+      <div class="flex flex-col gap-3 pt-4">
+        <ion-button
+          type="submit"
+          expand="block"
+          color="primary"
+          [disabled]="taskForm.invalid || saving || !isOnline"
+        >
+          Save
+        </ion-button>
+        <ion-button
+          expand="block"
+          fill="outline"
+          color="medium"
+          (click)="cancel()"
+        >
+          Cancel
+        </ion-button>
+      </div>
+    </form>
+  </ng-container>
+
+  <ng-template #offline>
+    <div class="offline-state">
+      <ion-icon name="cloud-offline-outline" class="offline-icon"></ion-icon>
+      <p class="offline-message">No Internet Connection</p>
+      <p class="offline-submessage">
+        Please connect to the internet to use the app.
+      </p>
     </div>
-  </form>
+  </ng-template>
 </ion-content>

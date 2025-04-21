@@ -55,6 +55,18 @@
       : 'Minimum 6 characters' }}
     </ion-text>
 
+    <div class="flex justify-end mb-4">
+      <ion-button
+        fill="clear"
+        color="primary"
+        (click)="forgotPassword()"
+        [disabled]="isLoading"
+        class="forgot-password"
+      >
+        Forgot Password?
+      </ion-button>
+    </div>
+
     <div class="flex flex-col gap-3">
       <ion-button
         type="submit"
